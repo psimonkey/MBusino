@@ -21,7 +21,7 @@ https://github.com/Zeppelin500/MBusino/tree/main/src/MBusinoNano5S/build/esp32.e
 
 ### Use for Flashing https://adafruit.github.io/Adafruit_WebSerial_ESPTool/
 
-* connect the S2 Mini with USB
+* connect the C3 Supermini with USB
 * press and hold the boot button, press the reset button, release the boot botton. 
 * press **Connect** and choose the USP Port
 * if connected click **Erase** and wait for finish
