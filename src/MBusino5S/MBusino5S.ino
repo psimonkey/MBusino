@@ -42,7 +42,7 @@ HardwareSerial MbusSerial(1);
 MBusCom mbus(&MbusSerial,37,39);
 #endif
 
-#define MBUSINO_VERSION "1.0.0"
+#define MBUSINO_VERSION "1.0.1"
 
 #if defined(ESP8266)
 #define ONE_WIRE_BUS1 2   //D4

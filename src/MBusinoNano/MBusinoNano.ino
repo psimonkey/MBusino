@@ -33,7 +33,7 @@ You should have received a copy of the GNU General Public License along with thi
 #include <EEPROM.h>
 #include <MBusCom.h>
 
-#define MBUSINO_VERSION "1.0.0"
+#define MBUSINO_VERSION "1.0.1"
 
 #define MBUS_ADDRESS 254
 
@@ -141,6 +141,7 @@ unsigned long timerReboot = 0;
 unsigned long timerAutodiscover = 0;
 unsigned long timerNetworkChange = 0;
 unsigned long timerETHmessage = 0;
+unsigned long timerLedAPmode = 0;
 
 void setupServer();
 
@@ -223,7 +224,7 @@ void setup() {
   byte tries = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    if (tries++ > 2) {
+    if (tries++ > 5) {
       if(eth_connected == false){
         WiFi.mode(WIFI_AP);
         WiFi.softAP("MBusino Setup Portal"); //, "secret");
@@ -357,6 +358,14 @@ void loop() {
 
   if(apMode == true){
     dnsServer.processNextRequest();
+    if((millis() - timerLedAPmode) > 500 && digitalRead(LED_BUILTIN)  == LOW){
+      digitalWrite(LED_BUILTIN,HIGH);
+      timerLedAPmode = millis();
+    }
+    if((millis() - timerLedAPmode) > 500 && digitalRead(LED_BUILTIN) == HIGH){
+      digitalWrite(LED_BUILTIN,LOW);
+      timerLedAPmode = millis();
+    }
   }
 
   //to notice Changes in Network an assign the right connection to the MQTT client
@@ -375,10 +384,17 @@ void loop() {
     timerNetworkChange = millis();
   }
 
-  if (!client.connected() && ((millis() - timerReconnect) > 5000)) {  
-    Serial.println("MQTT no connection");      
-    reconnect();
-    timerReconnect = millis();
+  if (!client.connected() ) {  
+    if((millis() - timerReconnect) > 5000){
+      Serial.println("MQTT no connection");   
+      if(apMode == false){   
+        reconnect();
+      }
+      else{
+        Serial.println(" --> AP is running"); 
+      }
+      timerReconnect = millis();
+    }
   }
   else{ // the whole main code run only if MQTT is connectet
     client.loop();  //MQTT Funktion
