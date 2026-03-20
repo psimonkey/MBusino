@@ -92,7 +92,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   </body>
 </html>)rawliteral";
 
-char html_buffer[sizeof(index_html)+200] = {0};
+char html_buffer[sizeof(index_html)+512] = {0};
 
 const char update_html[] PROGMEM = R"rawliteral(
 <!doctype html>
