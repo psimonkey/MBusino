@@ -1,9 +1,9 @@
 void setupServer(){
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-  request->send_P(200, "text/html", html_buffer); 
-  Serial.println("Webserver: Client Connected");
+    request->send(200, "text/html", (const char*)html_buffer);
+    Serial.println("Webserver: Client Connected");
   });
-    
+
   server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) {
       String inputMessage;
       String inputParam;
@@ -67,7 +67,7 @@ void setupServer(){
           userData.telegramDebug = inputMessage.toInt();
           credentialsReceived = true;
           }
-      }      
+      }
       if (request->hasParam("mbusInterval")) {
         inputMessage = request->getParam("mbusInterval")->value();
         inputParam = "mbusInterval";
@@ -98,22 +98,12 @@ void setupServer(){
   });
 }
 
+// In AP mode, redirect any unrecognised URL to the setup page (captive portal).
+// In normal mode, return 404.
 void onRequest(AsyncWebServerRequest *request){
-  //Handle Unknown Request
-  request->send(404);
-}
-
-class CaptiveRequestHandler : public AsyncWebHandler {
-public:
-  CaptiveRequestHandler() {}
-  virtual ~CaptiveRequestHandler() {}
-
-  //bool canHandle(AsyncWebServerRequest* request) const override { 
-  bool canHandle(AsyncWebServerRequest* request) { 
-    return true; 
-    }  
-
-  void handleRequest(AsyncWebServerRequest *request) {
-    request->send_P(200, "text/html", html_buffer); 
+  if(apMode){
+    request->redirect("/");
+  } else {
+    request->send(404);
   }
-};
+}
